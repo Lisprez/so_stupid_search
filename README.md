@@ -6,7 +6,7 @@
 * Enter the directory contains file with name of "Cargo.toml"
 * Run command as blow:
 
-    cargo build --release
+    > cargo build --release
 
 * Then you will get the executable file ./target/release/sfind
 
