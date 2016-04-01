@@ -14,3 +14,11 @@
   ```
   sfind search-string start-directory
   ```
+
+# Example
+
+ ```
+ sfind walk .
+ ```
+ 
+ ![image](https://github.com/Lispre/so_stupid_search/blob/master/sfind.jpg)
