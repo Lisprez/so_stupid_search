@@ -1,2 +1,16 @@
-# so_stupid_search
-This tool is for those who often want to search for a string deeply into a directory in recursive mode, but not with the great grep ...
+# so stupid search tool
+
+# install
+
+* Download the file
+* Enter the directory contains file with name of "Cargo.toml"
+* Run command as blow:
+
+    cargo build --release
+
+* Then you will get the executable file ./target/release/sfind
+
+# Usage
+  ```
+  sfind search-string start-directory
+  ```
