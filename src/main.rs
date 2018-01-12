@@ -98,7 +98,7 @@ fn main() {
     let args: Vec<String> = args().collect();
     if args.len() != 3 {
         println!("usage: sf pattern-string root-directory");
-        ()
+        return;
     }
     let pattern_str = &args[1];
     let root_dir = &args[2];
