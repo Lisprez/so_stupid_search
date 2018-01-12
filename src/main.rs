@@ -9,7 +9,6 @@ use std::path::Path;
 use std::io::prelude::*;
 
 fn is_text(file_path: &Path) -> bool {
-    let mut suspicious_bytes: usize = 0;
     if let Ok(mut file_handle) = File::open(file_path) {
         let mut buffer = [0;512];
         if let Ok(readed_size) = file_handle.read(&mut buffer) {
@@ -105,7 +104,7 @@ fn main() {
     let root_dir = &args[2];
 
     let pt = Path::new(&root_dir);
-    walk_through_dir(&pt, &pattern_str, &call_back);
+    walk_through_dir(&pt, &pattern_str, &call_back).unwrap();
 }
 
 fn walk_through_dir(dir: &Path,
@@ -119,18 +118,7 @@ fn walk_through_dir(dir: &Path,
             walk_through_dir(&path, pattern_str, cb)?;
         }
     } else {
-        match dir.extension() {
-            Some(extension_name) => {
-                let extension_name_str = extension_name.to_str();
-                match extension_name_str {
-                    Some(ref final_name) => {
-                        cb(&dir, pattern_str);
-                    },
-                    None => ()
-                }
-            },
-            None => ()
-        }
+        cb(&dir, pattern_str);
     }
 
     Ok(())
