@@ -1,47 +1,101 @@
-extern crate prettytable;
-use prettytable::Table;
-use prettytable::row::Row;
-use prettytable::cell::Cell;
-
-extern crate term;
+extern crate colored;
+use colored::*;
 
 use std::env::args;
 use std::io;
 use std::fs::File;
 use std::fs;
 use std::path::Path;
+use std::io::prelude::*;
 
+fn is_text(file_path: &Path) -> bool {
+    let mut suspicious_bytes: usize = 0;
+    if let Ok(mut file_handle) = File::open(file_path) {
+        let mut buffer = [0;512];
+        if let Ok(readed_size) = file_handle.read(&mut buffer) {
+            if readed_size == 0 {
+                return false;
+            }
+            let mut content = &buffer[0..readed_size];
+            if readed_size >= 3 && content[0] == 0xEF && content[1] == 0xBB && content[2] == 0xBF {
+                return true;
+            }
 
-fn call_back(de: &Path, btable: &mut Table, pt: &String) {
-    let mut line_num = 0;
-    let f = File::open(de).unwrap();
-    let buf = io::BufReader::new(f);
-    for line in io::BufRead::lines(buf) {
-        line_num += 1;
-        match line {
-            Ok(ln) => {
-                if ln.as_str().contains(pt) {
-                    let tmp = ln.as_str();
-                    let mut vec: Vec<Cell> = vec![];
-                    vec.push(Cell::new(de.file_name().unwrap().to_str().unwrap()).style_spec("Fy"));
-                    vec.push(Cell::new(line_num.to_string().as_str()).style_spec("Fr"));
-                    vec.push(Cell::new(&tmp).style_spec("Fg"));
-                    btable.add_row(Row::new(vec));
-                } else {
-                    ()
+            if readed_size >= 5 && "%PDF-".as_bytes() == &content[0..5] {
+                return false;
+            }
+
+            let mut i = 0;
+            while i <  readed_size {
+                if content[i] == '\0' as u8 {
+                    return false;
+                } else if (content[i] < 7 || content[i] > 14) && (content[i] < 32 || content[i] > 127) {
+                    if content[i] > 193 && content[i] < 224 && i + 1 < readed_size {
+                        i += 1;
+                        if content[i] > 127 && content[i] < 192 {
+                            continue;
+                        }
+                    } else if content[i] > 223 && content[i] < 240 && i + 2 < readed_size {
+                        i += 1;
+                        if content[i] > 127 && content[i] < 192 && content[i+1] > 127 && content[i+1] < 192 {
+                            i += 1;
+                            continue;
+                        }
+                    }
                 }
-            },
-            Err(_) => ()
+
+                i += 1;
+            }
+        }
+        true
+    } else {
+        false
+    }
+
+}
+
+fn call_back(de: &Path, pt: &String) {
+    if is_text(de) {
+        let mut switcher = false;
+        let mut line_num = 0;
+        let f = File::open(de).unwrap();
+        let buf = io::BufReader::new(f);
+        for line in io::BufRead::lines(buf) {
+            line_num += 1;
+            match line {
+                Ok(ln) => {
+                    if ln.as_str().contains(pt) {
+                        if !switcher {
+                            switcher = true;
+                            if let Some(path_str) = de.to_str() {
+                                println!("{}", path_str.green().bold());
+                            }
+                        }
+
+                        if  switcher {
+                            let v: Vec<&str> = ln.as_str().split(pt).collect();
+                            let v_len = v.len();
+                            print!("{}:", line_num);
+                            for i in 1..v_len+1 { 
+                                if i == v_len {
+                                    println!("{}", &v[i-1]);
+                                } else {
+                                    print!("{}", &v[i-1]);
+                                    print!("{}", pt.red().purple().magenta().bold());
+                                }
+                            }
+                        }
+                    } else {
+                        ()
+                    }
+                },
+                Err(_) => ()
+            }
         }
     }
 }
 
 fn main() {
-    let name_prefix: Vec<&str> = vec!["c", "C", "cpp", "cxx", "CXX", "h", "hpp", "rs", "rb", "py", "java", "txt", "xml", "json", "js", "hs", "toml", "ini", "yml", "yaml"];
-    let mut table: Table = Table::new();
-    table.add_row(Row::new(vec![Cell::new("file").style_spec("c"), 
-                                Cell::new("line").style_spec("c"),
-                                Cell::new("content").style_spec("c")]));
     let args: Vec<String> = args().collect();
     if args.len() != 3 {
         println!("usage: sf pattern-string root-directory");
@@ -51,23 +105,18 @@ fn main() {
     let root_dir = &args[2];
 
     let pt = Path::new(&root_dir);
-    walk_through_dir(&pt, &pattern_str, &name_prefix, &mut table, &call_back);
-    if table.len() != 1 {
-        table.printstd();
-    }
+    walk_through_dir(&pt, &pattern_str, &call_back);
 }
 
 fn walk_through_dir(dir: &Path,
                     pattern_str: &String,
-                    name_prefix: &Vec<&str>,
-                    btable: &mut Table,
-                    cb: &Fn(&Path, &mut Table, &String)) -> io::Result<()> 
+                    cb: &Fn(&Path, &String)) -> io::Result<()> 
 {
     if dir.is_dir() {
         for entry in fs::read_dir(dir)? {
             let entry = entry?;
             let path = entry.path();
-            walk_through_dir(&path, pattern_str, name_prefix, btable, cb)?;
+            walk_through_dir(&path, pattern_str, cb)?;
         }
     } else {
         match dir.extension() {
@@ -75,11 +124,7 @@ fn walk_through_dir(dir: &Path,
                 let extension_name_str = extension_name.to_str();
                 match extension_name_str {
                     Some(ref final_name) => {
-                        if name_prefix.contains(final_name) {
-                            cb(&dir, btable, pattern_str);
-                        } else {
-                            ()
-                        }
+                        cb(&dir, pattern_str);
                     },
                     None => ()
                 }

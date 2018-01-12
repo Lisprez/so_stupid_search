@@ -1,8 +1,9 @@
 [package]
-name = "sfind"
-version = "0.1.0"
-authors = ["fuxpro <fuxpro@qq.com>"]
+name = "sf"
+version = "0.1.1"
 
 [dependencies]
-prettytable-rs = "*"
-term = "*"
+colored = "*"
+
+[profile.release]
+opt-level = 2
