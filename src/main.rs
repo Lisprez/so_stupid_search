@@ -104,7 +104,7 @@ fn main() {
     let root_dir = &args[2];
 
     let pt = Path::new(&root_dir);
-    walk_through_dir(&pt, &pattern_str, &call_back).unwrap();
+    walk_through_dir(&pt, &pattern_str, &call_back);
 }
 
 fn walk_through_dir(dir: &Path,
