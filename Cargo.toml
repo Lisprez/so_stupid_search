@@ -9,7 +9,7 @@ description = "A tool for high-volume text operators that is easy to use without
 # These URLs point to more information about the package. These are
 # intended to be webviews of the relevant data, not necessarily compatible
 # with VCS tools and the like.
-documentation = "..."
+documentation = "https://github.com/Lispre/so_stupid_search/wiki"
 homepage = "https://github.com/Lispre/so_stupid_search"
 repository = "https://github.com/Lispre/so_stupid_search"
 
