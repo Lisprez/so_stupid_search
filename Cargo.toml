@@ -1,6 +1,114 @@
 [package]
 name = "sf"
 version = "0.1.1"
+# A short blurb about the package. This is not rendered in any format when
+# uploaded to crates.io (aka this is not markdown).
+description = "A tool for high-volume text operators that is easy to use without thinking, and adheres to the principle of minimal surprise"
+
+# These URLs point to more information about the package. These are
+# intended to be webviews of the relevant data, not necessarily compatible
+# with VCS tools and the like.
+documentation = "..."
+homepage = "https://github.com/Lispre/so_stupid_search"
+repository = "https://github.com/Lispre/so_stupid_search"
+
+# This points to a file under the package root (relative to this `Cargo.toml`).
+# The contents of this file are stored and indexed in the registry.
+# crates.io will render this file and place the result on the crate's page.
+readme = "README.md"
+
+# This is a list of up to five keywords that describe this crate. Keywords
+# are searchable on crates.io, and you may choose any words that would
+# help someone find this crate.
+keywords = ["grep"]
+
+# This is a list of up to five categories where this crate would fit.
+# Categories are a fixed list available at crates.io/category_slugs, and
+# they must match exactly.
+categories = ["utilities", "text"]
+
+# This is an SPDX 2.1 license expression for this package. Currently
+# crates.io will validate the license provided against a whitelist of
+# known license and exception identifiers from the SPDX license list
+# 2.4. Parentheses are not currently supported.
+#
+# Multiple licenses can be separated with a `/`, although that usage
+# is deprecated. Instead, use a license expression with AND and OR
+# operators to get more explicit semantics.
+license = "MIT"
+
+# If a package is using a nonstandard license, then this key may be specified in
+# lieu of the above key and must point to a file relative to this manifest
+# (similar to the readme key).
+license-file = "LICENSE"
+
+# Optional specification of badges to be displayed on crates.io.
+#
+# - The badges pertaining to build status that are currently available are
+#   Appveyor, CircleCI, GitLab, Azure DevOps and TravisCI.
+# - Available badges pertaining to code test coverage are Codecov and
+#   Coveralls.
+# - There are also maintenance-related badges based on isitmaintained.com
+#   which state the issue resolution time, percent of open issues, and future
+#   maintenance intentions.
+#
+# If a `repository` key is required, this refers to a repository in
+# `user/repo` format.
+[badges]
+
+# Appveyor: `repository` is required. `branch` is optional; default is `master`
+# `service` is optional; valid values are `github` (default), `bitbucket`, and
+# `gitlab`; `id` is optional; you can specify the appveyor project id if you
+# want to use that instead. `project_name` is optional; use when the repository
+# name differs from the appveyor project name.
+appveyor = { repository = "...", branch = "master", service = "github" }
+
+# Circle CI: `repository` is required. `branch` is optional; default is `master`
+circle-ci = { repository = "...", branch = "master" }
+
+# GitLab: `repository` is required. `branch` is optional; default is `master`
+gitlab = { repository = "...", branch = "master" }
+
+# Azure DevOps: `project` is required. `pipeline` is required. `build` is optional; default is `1`
+# Note: project = `organization/project`, pipeline = `name_of_pipeline`, build = `definitionId`
+azure-devops = { project = "...", pipeline = "...", build="2" }
+
+# Travis CI: `repository` in format "<user>/<project>" is required.
+# `branch` is optional; default is `master`
+travis-ci = { repository = "...", branch = "master" }
+
+# Codecov: `repository` is required. `branch` is optional; default is `master`
+# `service` is optional; valid values are `github` (default), `bitbucket`, and
+# `gitlab`.
+codecov = { repository = "...", branch = "master", service = "github" }
+
+# Coveralls: `repository` is required. `branch` is optional; default is `master`
+# `service` is optional; valid values are `github` (default) and `bitbucket`.
+coveralls = { repository = "...", branch = "master", service = "github" }
+
+# Is it maintained resolution time: `repository` is required.
+is-it-maintained-issue-resolution = { repository = "..." }
+
+# Is it maintained percentage of open issues: `repository` is required.
+is-it-maintained-open-issues = { repository = "..." }
+
+# Maintenance: `status` is required. Available options are:
+# - `actively-developed`: New features are being added and bugs are being fixed.
+# - `passively-maintained`: There are no plans for new features, but the maintainer intends to
+#   respond to issues that get filed.
+# - `as-is`: The crate is feature complete, the maintainer does not intend to continue working on
+#   it or providing support, but it works for the purposes it was designed for.
+# - `experimental`: The author wants to share it with the community but is not intending to meet
+#   anyone's particular use case.
+# - `looking-for-maintainer`: The current maintainer would like to transfer the crate to someone
+#   else.
+# - `deprecated`: The maintainer does not recommend using this crate (the description of the crate
+#   can describe why, there could be a better solution available or there could be problems with
+#   the crate that the author does not want to fix).
+# - `none`: Displays no badge on crates.io, since the maintainer has not chosen to specify
+#   their intentions, potential crate users will need to investigate on their own.
+maintenance = { status = "..." }
+
 
 [dependencies]
 colored = "*"
