@@ -3,7 +3,7 @@ use colored::*;
 
 use std::env::args;
 use std::io;
-use std::fs::{File, DirEntry};
+use std::fs::File;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::io::prelude::*;
@@ -17,7 +17,7 @@ fn is_text(file_path: &Path) -> bool {
             if readed_size == 0 {
                 return false;
             }
-            let mut content = &buffer[0..readed_size];
+            let content = &buffer[0..readed_size];
             if readed_size >= 3 && content[0] == 0xEF && content[1] == 0xBB && content[2] == 0xBF {
                 return true;
             }
@@ -95,95 +95,6 @@ fn call_back(de: &Path, pt: &String) {
     }
 }
 
-//fn main() {
-//    let args: Vec<String> = args().collect();
-//    if args.len() != 3 && args.len() != 5 {
-//	      println!("usage: sf pattern-string root-directory");
-//        println!("       sf -t file_ext pattern-string root-directory");
-//        println!("       sf pattern-string root-directory -t file_ext");
-//        return;
-//    }
-//
-//    if args.len() == 3 {
-//	      let pattern_str = &args[1];
-//        let root_dir = &args[2];
-//
-//        let pt = Path::new(&root_dir);
-//        walk_through_dir(&pt, &"".to_string(), &pattern_str, &call_back);
-//    } else {
-//        if args.contains(&"-t".to_string()) {
-//            if let Some(index) = args.iter().position(|&ref r| *r == "-t".to_string()) {
-//                if index == 1 {
-//                    let pattern_str = &args[3];
-//                    let root_dir = &args[4];
-//                    let pt = Path::new(&root_dir);
-//                    walk_through_dir(&pt, &args[2], &pattern_str, &call_back);
-//                } else if index == 3 {
-//                    let pattern_str = &args[1];
-//                    let root_dir = &args[2];
-//                    let pt = Path::new(&root_dir);
-//                    walk_through_dir(&pt, &args[4], &pattern_str, &call_back);
-//                } else {
-//                    
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//fn walk_through_dir(dir: &Path,
-//                    file_ext: &String,
-//                    pattern_str: &String,
-//                    cb: &Fn(&Path, &String)) -> io::Result<()>
-//{
-//    // if dir.is_dir() {
-//    //     for entry in fs::read_dir(dir)? {
-//    //         let entry = entry?;
-//    //         let path = entry.path();
-//    //         walk_through_dir(&path, file_ext, pattern_str, cb);
-//    //     }
-//    // } else {
-//    //     if *file_ext == "".to_string() {
-//    //         cb(&dir, pattern_str);
-//    //     } else {
-//    //         if let Some(ext_name) = dir.extension() {
-//    //             if OsString::from(file_ext) == ext_name {
-//    //                 cb(&dir, pattern_str);
-//    //             } else {
-//    //             }
-//    //         } else {
-//    //         }
-//    //     }
-//    // }
-//    let mut common_files: Vec<Path> = vec![];
-//    let mut dirs: Vec<Path> = vec![];
-//
-//    // is directory
-//    if dir.is_dir() {
-//        for entry in fs::read_dir(dir)? {
-//            let entry_ = entry?;
-//            if !entry_.is_dir() {
-//                common_files.append(entry_);
-//            } else {
-//                dires.append(entry_);
-//            }
-//        }
-//    } else { // is common file
-//        if *file_ext == "".to_string() {
-//            cb(element, pattern_str);
-//        } else {
-//            if let Some(ext_name) = dir.extension() {
-//                if OsString::from(file_ext) == ext_name {
-//                    cb(&dir, pattern_str);
-//                } else {
-//                }
-//            } else {
-//
-//            }
-//    }
-//
-//    Ok(())
-//}
 
 fn main() {
     let args: Vec<String> = args().collect();
@@ -266,7 +177,7 @@ fn main() {
 }
 
 
-fn find_match(root_dir: &Path, file_ext: &String, pattern_str: &String, cb: &Fn(&Path, &String)) -> Vec<PathBuf> {
+fn find_match(root_dir: &Path, file_ext: &String, pattern_str: &String, cb: &dyn Fn(&Path, &String)) -> Vec<PathBuf> {
     let mut vec: Vec<PathBuf> = vec![];
 
     match fs::read_dir(root_dir) {
@@ -290,11 +201,11 @@ fn find_match(root_dir: &Path, file_ext: &String, pattern_str: &String, cb: &Fn(
                             vec.push(dir_entry.path());
                         }
                     }
-                    Err(err_obj) => ()
+                    Err(_) => ()
                 }
             }
         }
-        Err(error_obj) => ()
+        Err(_) => ()
     }
     vec
 }
