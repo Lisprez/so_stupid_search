@@ -41,7 +41,7 @@ license = "LGPL2"
 # If a package is using a nonstandard license, then this key may be specified in
 # lieu of the above key and must point to a file relative to this manifest
 # (similar to the readme key).
-license-file = "..."
+#license-file = "..."
 
 # Optional specification of badges to be displayed on crates.io.
 #
