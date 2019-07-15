@@ -36,12 +36,12 @@ categories = ["utilities", "text"]
 # Multiple licenses can be separated with a `/`, although that usage
 # is deprecated. Instead, use a license expression with AND and OR
 # operators to get more explicit semantics.
-license = "GNU Lesser General Public License v2.1"
+#license = "GNU Lesser General Public License v2.1"
 
 # If a package is using a nonstandard license, then this key may be specified in
 # lieu of the above key and must point to a file relative to this manifest
 # (similar to the readme key).
-#license-file = "..."
+license-file = "LICENSE"
 
 # Optional specification of badges to be displayed on crates.io.
 #
