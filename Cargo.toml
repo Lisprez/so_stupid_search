@@ -1,5 +1,5 @@
 [package]
-name = "sf"
+name = "so_stupid_search"
 version = "0.1.1"
 authors = ["lispre@qq.com"]
 # A short blurb about the package. This is not rendered in any format when
