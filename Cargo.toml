@@ -112,7 +112,7 @@ maintenance = { status = "..." }
 
 
 [dependencies]
-colored = "*"
+colored = "1.8.0"
 
 [profile.release]
 opt-level = 2
