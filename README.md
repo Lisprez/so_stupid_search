@@ -32,4 +32,3 @@ alias sss=$HOME/.cargo/bin/so_stupid_search
  sss walk .
  ```
  
- ![image](https://github.com/Lispre/so_stupid_search/blob/master/sfind.jpg)
