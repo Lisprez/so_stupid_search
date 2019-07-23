@@ -7,22 +7,29 @@
 * Enter the directory contains file with name of "Cargo.toml"
 * Run command as blow:
 
-    > cargo build --release
+```bash
+cargo build --release
+```
 
 * Then you will get the executable file ./target/release/sfind
 
 ## install by cargo
-* cargo install so_stupid_search
+
+```bash
+cargo install so_stupid_search
+alias sss=$HOME/.cargo/bin/so_stupid_search
+```
 
 # Usage
-  ```
-  sf search-string start-directory
+
+  ```bash
+  sss search-string start-directory
   ```
 
 # Example
 
- ```
- sf walk .
+ ```bash
+ sss walk .
  ```
  
  ![image](https://github.com/Lispre/so_stupid_search/blob/master/sfind.jpg)
