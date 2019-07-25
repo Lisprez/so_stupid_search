@@ -99,7 +99,7 @@ version = "0.8.13"
 source = "registry+git://mirrors.ustc.edu.cn/crates.io-index"
 
 [[package]]
-name = "so_stupid_search"
+name = "sss"
 version = "0.1.1"
 dependencies = [
  "colored 1.8.0 (registry+git://mirrors.ustc.edu.cn/crates.io-index)",
