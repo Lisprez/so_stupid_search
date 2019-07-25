@@ -1,18 +1,18 @@
 extern crate colored;
 use colored::*;
 
-use std::env::args;
-use std::io;
-use std::fs::File;
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::io::prelude::*;
-use std::ffi::OsString;
 use std::collections::VecDeque;
+use std::env::args;
+use std::ffi::OsString;
+use std::fs;
+use std::fs::File;
+use std::io;
+use std::io::prelude::*;
+use std::path::{Path, PathBuf};
 
 fn is_text(file_path: &Path) -> bool {
     if let Ok(mut file_handle) = File::open(file_path) {
-        let mut buffer = [0;512];
+        let mut buffer = [0; 512];
         if let Ok(readed_size) = file_handle.read(&mut buffer) {
             if readed_size == 0 {
                 return false;
@@ -27,10 +27,12 @@ fn is_text(file_path: &Path) -> bool {
             }
 
             let mut i = 0;
-            while i <  readed_size {
+            while i < readed_size {
                 if content[i] == '\0' as u8 {
                     return false;
-                } else if (content[i] < 7 || content[i] > 14) && (content[i] < 32 || content[i] > 127) {
+                } else if (content[i] < 7 || content[i] > 14)
+                    && (content[i] < 32 || content[i] > 127)
+                {
                     if content[i] > 193 && content[i] < 224 && i + 1 < readed_size {
                         i += 1;
                         if content[i] > 127 && content[i] < 192 {
@@ -38,7 +40,11 @@ fn is_text(file_path: &Path) -> bool {
                         }
                     } else if content[i] > 223 && content[i] < 240 && i + 2 < readed_size {
                         i += 1;
-                        if content[i] > 127 && content[i] < 192 && content[i+1] > 127 && content[i+1] < 192 {
+                        if content[i] > 127
+                            && content[i] < 192
+                            && content[i + 1] > 127
+                            && content[i + 1] < 192
+                        {
                             i += 1;
                             continue;
                         }
@@ -72,15 +78,15 @@ fn call_back(de: &Path, pt: &String) {
                             }
                         }
 
-                        if  switcher {
+                        if switcher {
                             let v: Vec<&str> = ln.as_str().split(pt).collect();
                             let v_len = v.len();
                             print!("{}:", line_num);
-                            for i in 1..v_len+1 {
+                            for i in 1..v_len + 1 {
                                 if i == v_len {
-                                    println!("{}", &v[i-1]);
+                                    println!("{}", &v[i - 1]);
                                 } else {
-                                    print!("{}", &v[i-1]);
+                                    print!("{}", &v[i - 1]);
                                     print!("{}", pt.red().purple().magenta().bold());
                                 }
                             }
@@ -88,30 +94,28 @@ fn call_back(de: &Path, pt: &String) {
                     } else {
                         ()
                     }
-                },
-                Err(_) => ()
+                }
+                Err(_) => (),
             }
         }
     }
 }
 
-
 fn main() {
     let args: Vec<String> = args().collect();
     if args.len() != 3 && args.len() != 5 {
-    	println!("usage: sf pattern-string root-directory");
-        println!("       sf -t file_ext pattern-string root-directory");
-        println!("       sf pattern-string root-directory -t file_ext");
-        println!("eg:    sf main ./src");
-        println!("eg:    sf -t cpp main ./src");
-        println!("eg:    sf main ./src -t cpp");
+        println!("usage: sss pattern-string root-directory");
+        println!("       sss -t file_ext pattern-string root-directory");
+        println!("       sss pattern-string root-directory -t file_ext");
+        println!("eg:    sss main ./src");
+        println!("eg:    sss -t cpp main ./src");
+        println!("eg:    sss main ./src -t cpp");
         return;
     }
 
     let mut queue: VecDeque<PathBuf> = VecDeque::new();
-    
     if args.len() == 3 {
-	    let pattern_str = &args[1];
+        let pattern_str = &args[1];
         let root_dir = &args[2];
 
         let pt = Path::new(&root_dir);
@@ -122,11 +126,13 @@ fn main() {
         while queue.len() != 0 {
             match queue.pop_front() {
                 Some(path_buf) => {
-                    for element in find_match(path_buf.as_path(), &"".to_string(), pattern_str, &call_back) {
+                    for element in
+                        find_match(path_buf.as_path(), &"".to_string(), pattern_str, &call_back)
+                    {
                         queue.push_back(element);
                     }
                 }
-                None => ()
+                None => (),
             }
         }
     } else {
@@ -143,11 +149,16 @@ fn main() {
                     while queue.len() != 0 {
                         match queue.pop_front() {
                             Some(path_buf) => {
-                                for element in find_match(path_buf.as_path(), &args[2], pattern_str, &call_back) {
+                                for element in find_match(
+                                    path_buf.as_path(),
+                                    &args[2],
+                                    pattern_str,
+                                    &call_back,
+                                ) {
                                     queue.push_back(element);
                                 }
                             }
-                            None => ()
+                            None => (),
                         }
                     }
                 } else if index == 3 {
@@ -161,23 +172,31 @@ fn main() {
                     while queue.len() != 0 {
                         match queue.pop_front() {
                             Some(path_buf) => {
-                                for element in find_match(path_buf.as_path(), &args[4], pattern_str, &call_back) {
+                                for element in find_match(
+                                    path_buf.as_path(),
+                                    &args[4],
+                                    pattern_str,
+                                    &call_back,
+                                ) {
                                     queue.push_back(element);
                                 }
                             }
-                            None => ()
+                            None => (),
                         }
                     }
                 } else {
-                    
                 }
             }
         }
     }
 }
 
-
-fn find_match(root_dir: &Path, file_ext: &String, pattern_str: &String, cb: &dyn Fn(&Path, &String)) -> Vec<PathBuf> {
+fn find_match(
+    root_dir: &Path,
+    file_ext: &String,
+    pattern_str: &String,
+    cb: &dyn Fn(&Path, &String),
+) -> Vec<PathBuf> {
     let mut vec: Vec<PathBuf> = vec![];
 
     match fs::read_dir(root_dir) {
@@ -201,11 +220,11 @@ fn find_match(root_dir: &Path, file_ext: &String, pattern_str: &String, cb: &dyn
                             vec.push(dir_entry.path());
                         }
                     }
-                    Err(_) => ()
+                    Err(_) => (),
                 }
             }
         }
-        Err(_) => ()
+        Err(_) => (),
     }
     vec
 }
