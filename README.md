@@ -30,5 +30,7 @@ alias sss=$HOME/.cargo/bin/so_stupid_search
 
  ```bash
  sss walk .
+ only search in kubernetes yaml files
+ sss -t yaml fuck_str .
  ```
  
