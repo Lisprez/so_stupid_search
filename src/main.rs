@@ -1,4 +1,5 @@
 extern crate colored;
+extern crate isatty;
 use colored::*;
 
 use std::collections::VecDeque;
@@ -9,6 +10,7 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
+use isatty::{stdin_isatty};
 
 fn is_text(file_path: &Path) -> bool {
     if let Ok(mut file_handle) = File::open(file_path) {
@@ -103,14 +105,43 @@ fn call_back(de: &Path, pt: &String) {
 
 fn main() {
     let args: Vec<String> = args().collect();
-    if args.len() != 3 && args.len() != 5 {
-        println!("usage: sss pattern-string root-directory");
-        println!("       sss -t file_ext pattern-string root-directory");
-        println!("       sss pattern-string root-directory -t file_ext");
-        println!("eg:    sss main ./src");
-        println!("eg:    sss -t cpp main ./src");
-        println!("eg:    sss main ./src -t cpp");
+    if (args.len() == 2 && stdin_isatty()) || (args.len() != 2 && args.len() != 3 && args.len() != 5) {
+        println!("usage:   sss pattern-string root-directory             在指定目录root-directory下面搜索pattern-string");
+        println!("         sss -t file_ext pattern-string root-directory 在指定目录root-directory下面对扩展名是file_ext的文件搜索pattern-string");
+        println!("         sss pattern-string root-directory -t file_ext 在指定目录root-directory下面对扩展名是file_ext的文件搜索pattern-string");
+        println!("         command | sss pattern-string                  对命令command的输出进行pattern-string搜索");
+        println!("version: 3.4.1");
+        println!(`eg:      sss "func main(" ./src`);
+        println!(`eg:      sss -t go "func main(" ./src`);
+        println!(`eg:      sss "func main(" ./src -t cpp`);
+        println!(`eg:      somme_command | sss pattern-string`);
         return;
+    }
+
+    if args.len() == 2 && !stdin_isatty() {
+        let buf = io::BufReader::new(std::io::stdin());
+        for line in io::BufRead::lines(buf) {
+            match line {
+                Ok(ln) => {
+                    if ln.contains(args[1].as_str()) {
+                        let v: Vec<&str> = ln.split(args[1].as_str()).collect();
+                        let v_len = v.len();
+                        for i in 1..v_len + 1 {
+                            if i == v_len {
+                                println!("{}", &v[i - 1]);
+                            } else {
+                                print!("{}", &v[i - 1]);
+                                print!("{}", args[1].red().purple().magenta().bold());
+                            }
+                        }
+                    } else {
+                        ()
+                    }
+                }
+                Err(_) => (),
+            }
+        }
+        return
     }
 
     let mut queue: VecDeque<PathBuf> = VecDeque::new();

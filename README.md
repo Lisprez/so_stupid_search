@@ -1,42 +1,75 @@
-# so stupid search tool
+# so stupid search tool <阿Q的哥锐普>
 
-# install
+# English Documentation
 
-## install from source code
-* Download the file
-* Enter the directory contains file with name of "Cargo.toml"
-* Run command as blow:
+## install
 
+### install from source code
+1.install rust toolchain
 ```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+2.Download the file
+```bash
+git clone https://github.com/Lispre/so_stupid_search.git
+```
+3.Enter the directory contains file with name of "Cargo.toml" and Run command as blow:
+```bash
+cd so_stupid_search
 cargo build --release
 ```
+4.Then you will get the executable file "so_stupid_search/target/release/sss"
 
-* Then you will get the executable file ./target/release/sfind
-
-## install by cargo
-
+5.move the executable file sss to your $PATH directory
 ```bash
-cargo install so_stupid_search
-alias sss=$HOME/.cargo/bin/so_stupid_search
+sudo mv ./target/release/sss /usr/local/bin/
 ```
 
-# Usage
-
-  ```bash
+## Usage
+### search file system
+```bash
   sss search-string start-directory
-  ```
-
-# Example
-
-## common search
+```
+### filter command pipe
 ```bash
-sss walk .
+  command | sss main.go
 ```
 
-## search specified type of file
+## Example
 
+### common search
+```bash
+sss "func main(" .
+```
+
+### search specified type of file
 ```bash
 #only search in kubernetes yaml files
 sss -t yaml fuck_str .
 ```
  
+# 中文文档
+
+## 安装
+### 从源代码构建安装
+1.安装rust编译器
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+2.下载so_stupid_search源代码
+```bash
+git clone https://github.com/Lispre/so_stupid_search.git
+```
+3.进入源码根目录进行构建
+```bash
+cd so_stupid_search
+cargo build --release
+```
+
+4.获得可执行文件 "so_stupid_search/target/release/sss"
+
+5.将sss可执行文件复制到 $PATH 变量包含的一个目录中
+```bash
+sudo mv ./target/release/sss /usr/local/bin/
+```
+6.现在你就可以像阿Q一样使用sss了

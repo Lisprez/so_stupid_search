@@ -113,6 +113,7 @@ maintenance = { status = "..." }
 
 [dependencies]
 colored = "1.8.0"
+isatty = "0.1"
 
 [profile.release]
 opt-level = 2
