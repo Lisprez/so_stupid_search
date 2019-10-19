@@ -32,7 +32,7 @@ sudo mv ./target/release/sss /usr/local/bin/
 ```
 ### filter command pipe
 ```bash
-  command | sss main.go
+  command | sss pattern-string
 ```
 
 ## Example
