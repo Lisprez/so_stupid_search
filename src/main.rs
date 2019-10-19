@@ -111,10 +111,10 @@ fn main() {
         println!("         sss pattern-string root-directory -t file_ext 在指定目录root-directory下面对扩展名是file_ext的文件搜索pattern-string");
         println!("         command | sss pattern-string                  对命令command的输出进行pattern-string搜索");
         println!("version: 3.4.1");
-        println!(`eg:      sss "func main(" ./src`);
-        println!(`eg:      sss -t go "func main(" ./src`);
-        println!(`eg:      sss "func main(" ./src -t cpp`);
-        println!(`eg:      somme_command | sss pattern-string`);
+        println!(r#"eg:      sss "func main(" ./src"#);
+        println!(r#"eg:      sss -t go "func main(" ./src"#);
+        println!(r#"eg:      sss "func main(" ./src -t cpp"#);
+        println!(r#"eg:      somme_command | sss pattern-string"#);
         return;
     }
 
