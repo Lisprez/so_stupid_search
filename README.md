@@ -1,5 +1,7 @@
 # so stupid search tool <阿Q的哥锐普>
 
+![Farmers Market Finder Demo](sss-demo.gif)
+
 # English Documentation
 
 ## install
