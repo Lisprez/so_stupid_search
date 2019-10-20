@@ -83,7 +83,7 @@ fn call_back(de: &Path, pt: &String) {
                         if switcher {
                             let v: Vec<&str> = ln.as_str().split(pt).collect();
                             let v_len = v.len();
-                            print!("{}:", line_num);
+                            print!("{num:->6}: ", num=line_num);
                             for i in 1..v_len + 1 {
                                 if i == v_len {
                                     println!("{}", &v[i - 1]);
