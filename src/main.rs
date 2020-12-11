@@ -1,3 +1,6 @@
+#[global_allocator]
+static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
+
 extern crate colored;
 extern crate isatty;
 use colored::*;
@@ -106,11 +109,11 @@ fn call_back(de: &Path, pt: &String) {
 fn main() {
     let args: Vec<String> = args().collect();
     if (args.len() == 2 && stdin_isatty()) || (args.len() != 2 && args.len() != 3 && args.len() != 5) {
-        println!("usage:   sss pattern-string root-directory             在指定目录root-directory下面搜索pattern-string");
-        println!("         sss -t file_ext pattern-string root-directory 在指定目录root-directory下面对扩展名是file_ext的文件搜索pattern-string");
-        println!("         sss pattern-string root-directory -t file_ext 在指定目录root-directory下面对扩展名是file_ext的文件搜索pattern-string");
-        println!("         command | sss pattern-string                  对命令command的输出进行pattern-string搜索");
-        println!("version: 3.4.1");
+        println!("usage:   sss pattern-string root-directory");
+        println!("         sss -t file_ext pattern-string root-directory");
+        println!("         sss pattern-string root-directory -t file_ext");
+        println!("         command | sss pattern-string");
+        println!("version: 3.4.2");
         println!(r#"eg:      sss "func main(" ./src"#);
         println!(r#"eg:      sss -t go "func main(" ./src"#);
         println!(r#"eg:      sss "func main(" ./src -t cpp"#);
