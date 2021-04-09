@@ -11,21 +11,29 @@
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
-2.Download the file
+2.build and install in one command
 ```bash
-git clone https://github.com/Lispre/so_stupid_search.git
+cargo install --git https://github.com/Lispre/so_stupid_search.git
 ```
-3.Enter the directory contains file with name of "Cargo.toml" and Run command as blow:
-```bash
-cd so_stupid_search
-cargo build --release
-```
-4.Then you will get the executable file "so_stupid_search/target/release/sss"
+---
+**Warning**
 
-5.move the executable file sss to your $PATH directory
-```bash
-sudo mv ./target/release/sss /usr/local/bin/
-```
+If you are living in SOME specifily area(China mainland), you should do as follow to build and install, because you are live behind GFW that network is ... ...
+> 1.Download the file
+>```bash
+>git clone https://github.com/Lispre/so_stupid_search.git
+>```
+>2.Enter the directory contains file with name of "Cargo.toml" and Run command as blow:
+>```bash
+>cd so_stupid_search
+>cargo build --release
+>```
+>3.Then you will get the executable file "so_stupid_search/target/release/sss"
+
+>4.move the executable file sss to your $PATH directory
+>```bash
+>sudo mv ./target/release/sss /usr/local/bin/
+>```
 
 ## Usage
 ### search file system
