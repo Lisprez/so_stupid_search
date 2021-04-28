@@ -1,5 +1,7 @@
 # SSS - so stupid search tool <阿Q的哥锐普>
 
+[![Join the chat at https://gitter.im/cpp2x-rust-zig/community](https://badges.gitter.im/cpp2x-rust-zig/community.svg)](https://gitter.im/cpp2x-rust-zig/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ![Farmers Market Finder Demo](sss-demo.gif)
 
 # English Documentation
