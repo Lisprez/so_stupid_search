@@ -1,4 +1,18 @@
 # SSS - so stupid search tool <阿Q的哥锐普>
+---
+"so stupid search" is a tool built for himself by a programmer who believes in minimalism. He always reminds himself to cherish his time and let himself spend every minute in simplicity and happiness
+
+---
+「so stupid search」は、ミニマリズムを信じるプログラマーが自分のために作ったツールで、いつも自分の時間を大切にし、シンプルさと幸せに毎分費やすように心がけています。
+
+---
+"So stupid search"는 미니멀리즘을 믿는 프로그래머가 자신을 위해 만든 도구입니다. 그는 항상 자신의 시간을 소중히 여기고 단순함과 행복 속에 매 순간을 보내도록 자신을 상기시킵니다.
+
+---
+«so stupid search» - это инструмент, созданный для себя программистом, который верит в минимализм. Он всегда напоминает себе, что нужно ценить свое время и позволять себе тратить каждую минуту в простоте и счастье.
+
+---
+"so stupid search" är ett verktyg som byggts för sig själv av en programmerare som tror på minimalism. Han påminner sig alltid om att värna om sin tid och låta sig spendera varje minut i enkelhet och lycka.
 
 [![Join the chat at https://gitter.im/cpp2x-rust-zig/community](https://badges.gitter.im/cpp2x-rust-zig/community.svg)](https://gitter.im/cpp2x-rust-zig/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
