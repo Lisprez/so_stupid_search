@@ -9,9 +9,9 @@ description = "A tool for high-volume text operators that is easy to use without
 # These URLs point to more information about the package. These are
 # intended to be webviews of the relevant data, not necessarily compatible
 # with VCS tools and the like.
-documentation = "https://github.com/Lispre/so_stupid_search/wiki"
-homepage = "https://github.com/Lispre/so_stupid_search"
-repository = "https://github.com/Lispre/so_stupid_search"
+documentation = "https://github.com/Lisprez/so_stupid_search/wiki"
+homepage = "https://github.com/Lisprez/so_stupid_search"
+repository = "https://github.com/Lisprez/so_stupid_search"
 
 # This points to a file under the package root (relative to this `Cargo.toml`).
 # The contents of this file are stored and indexed in the registry.
