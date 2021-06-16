@@ -1,6 +1,6 @@
 [package]
 name = "sss"
-version = "0.1.1"
+version = "3.4.3"
 authors = ["lispre@qq.com"]
 # A short blurb about the package. This is not rendered in any format when
 # uploaded to crates.io (aka this is not markdown).
@@ -21,12 +21,12 @@ readme = "README.md"
 # This is a list of up to five keywords that describe this crate. Keywords
 # are searchable on crates.io, and you may choose any words that would
 # help someone find this crate.
-keywords = ["grep"]
+keywords = ["grep", "egrep", "ag", "ripgrep", "pt"]
 
 # This is a list of up to five categories where this crate would fit.
 # Categories are a fixed list available at crates.io/category_slugs, and
 # they must match exactly.
-categories = ["utilities", "text"]
+categories = ["utilities", "text", "cli", "terminal"]
 
 # This is an SPDX 2.1 license expression for this package. Currently
 # crates.io will validate the license provided against a whitelist of
