@@ -1,4 +1,4 @@
-＊SSS - so stupid search <Primitive's command line text tool>＊
+**SSS - so stupid search <Primitive's command line text tool>**
 ---
 "so stupid search" is a tool built for himself by a programmer who believes in minimalism. He always reminds himself to cherish his time and let himself spend every minute in simplicity and happiness
 
