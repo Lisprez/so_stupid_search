@@ -3,6 +3,7 @@ static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
 
 extern crate colored;
 extern crate isatty;
+extern crate memchr;
 use colored::*;
 
 use std::collections::VecDeque;
@@ -14,6 +15,7 @@ use std::io;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use isatty::{stdin_isatty};
+use memchr::memmem;
 
 fn is_text(file_path: &Path) -> bool {
     if let Ok(mut file_handle) = File::open(file_path) {
@@ -69,13 +71,15 @@ fn call_back(de: &Path, pt: &String) {
     if is_text(de) {
         let mut switcher = false;
         let mut line_num = 0;
+        let finder = memmem::Finder::new(pt);
         let f = File::open(de).unwrap();
         let buf = io::BufReader::new(f);
         for line in io::BufRead::lines(buf) {
             line_num += 1;
             match line {
                 Ok(ln) => {
-                    if ln.as_str().contains(pt) {
+                    let find_result = finder.find(ln.as_bytes());
+                    if find_result.is_some() {
                         if !switcher {
                             switcher = true;
                             if let Some(path_str) = de.to_str() {
@@ -113,11 +117,11 @@ fn main() {
         println!("         sss -t file_ext pattern-string root-directory");
         println!("         sss pattern-string root-directory -t file_ext");
         println!("         command | sss pattern-string");
-        println!("version: 3.4.2");
+        println!("version: 3.4.3");
         println!(r#"eg:      sss "func main(" ./src"#);
         println!(r#"eg:      sss -t go "func main(" ./src"#);
         println!(r#"eg:      sss "func main(" ./src -t cpp"#);
-        println!(r#"eg:      somme_command | sss pattern-string"#);
+        println!(r#"eg:      somme_command | sss "pattern-string""#);
         return;
     }
 

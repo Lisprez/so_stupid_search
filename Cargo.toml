@@ -115,6 +115,7 @@ maintenance = { status = "..." }
 colored = "1.8.0"
 isatty = "0.1"
 jemallocator = "0.3.2"
+memchr = { version = "2", default-features = false }
 
 [profile.release]
 opt-level = 2
