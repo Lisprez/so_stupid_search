@@ -6,6 +6,8 @@ authors = ["lispre@qq.com"]
 # uploaded to crates.io (aka this is not markdown).
 description = "A tool for high-volume text operators that is easy to use without thinking, and adheres to the principle of minimal surprise"
 
+edition = "2021"
+
 # These URLs point to more information about the package. These are
 # intended to be webviews of the relevant data, not necessarily compatible
 # with VCS tools and the like.
@@ -112,10 +114,10 @@ maintenance = { status = "..." }
 
 
 [dependencies]
-colored = "1.8.0"
-isatty = "0.1"
-jemallocator = "0.3.2"
-memchr = { version = "2", default-features = false }
+mimalloc = { version = "0.1.43", features = ["secure"] }
+colored = "2.1.0"
+atty = "0.2.14"
+memchr = { version = "2.7.4", default-features = false }
 
 [profile.release]
 opt-level = 3

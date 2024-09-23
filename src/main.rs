@@ -1,110 +1,83 @@
 #[global_allocator]
-static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
-extern crate colored;
-extern crate isatty;
-extern crate memchr;
-use colored::*;
-
+use colored::Colorize;
+use memchr::memmem;
 use std::collections::VecDeque;
 use std::env::args;
-use std::ffi::OsString;
-use std::fs;
-use std::fs::File;
-use std::io;
-use std::io::prelude::*;
+use std::fs::{self, File};
+use std::io::{self, BufRead, Read};
 use std::path::{Path, PathBuf};
-use isatty::{stdin_isatty};
-use memchr::memmem;
+use atty::Stream;
+
 
 fn is_text(file_path: &Path) -> bool {
+    let mut buffer = [0; 512];
     if let Ok(mut file_handle) = File::open(file_path) {
-        let mut buffer = [0; 512];
-        if let Ok(readed_size) = file_handle.read(&mut buffer) {
-            if readed_size == 0 {
+        if let Ok(read_size) = file_handle.read(&mut buffer) {
+            if read_size == 0 {
                 return false;
             }
-            let content = &buffer[0..readed_size];
-            if readed_size >= 3 && content[0] == 0xEF && content[1] == 0xBB && content[2] == 0xBF {
+            let content = &buffer[..read_size];
+
+            // UTF-8 BOM check
+            if read_size >= 3 && content.starts_with(&[0xEF, 0xBB, 0xBF]) {
                 return true;
             }
 
-            if readed_size >= 5 && "%PDF-".as_bytes() == &content[0..5] {
+            // PDF file check
+            if read_size >= 5 && content.starts_with(b"%PDF-") {
                 return false;
             }
 
-            let mut i = 0;
-            while i < readed_size {
-                if content[i] == '\0' as u8 {
-                    return false;
-                } else if (content[i] < 7 || content[i] > 14)
-                    && (content[i] < 32 || content[i] > 127)
-                {
-                    if content[i] > 193 && content[i] < 224 && i + 1 < readed_size {
-                        i += 1;
-                        if content[i] > 127 && content[i] < 192 {
-                            continue;
-                        }
-                    } else if content[i] > 223 && content[i] < 240 && i + 2 < readed_size {
-                        i += 1;
-                        if content[i] > 127
-                            && content[i] < 192
-                            && content[i + 1] > 127
-                            && content[i + 1] < 192
-                        {
-                            i += 1;
-                            continue;
-                        }
+            // Non-text character checks
+            for &byte in content {
+                if byte == 0 || ((byte < 7 || byte > 14) && (byte < 32 || byte > 127)) {
+                    if !is_valid_utf8_byte(byte, &content) {
+                        return false;
                     }
                 }
-
-                i += 1;
             }
         }
-        true
-    } else {
-        false
+    }
+    true
+}
+
+fn is_valid_utf8_byte(byte: u8, content: &[u8]) -> bool {
+    match byte {
+        193..=223 if content.len() >= 2 => content[1] > 127 && content[1] < 192,
+        224..=239 if content.len() >= 3 => content[1] > 127 && content[1] < 192 && content[2] > 127 && content[2] < 192,
+        _ => true,
     }
 }
 
-fn call_back(de: &Path, pt: &String) {
-    if is_text(de) {
-        let mut switcher = false;
-        let mut line_num = 0;
-        let finder = memmem::Finder::new(pt);
-        let f = File::open(de).unwrap();
-        let buf = io::BufReader::new(f);
-        for line in io::BufRead::lines(buf) {
-            line_num += 1;
-            match line {
-                Ok(ln) => {
-                    let find_result = finder.find(ln.as_bytes());
-                    if find_result.is_some() {
-                        if !switcher {
-                            switcher = true;
-                            if let Some(path_str) = de.to_str() {
-                                println!("{}", path_str.green().bold());
-                            }
-                        }
+fn call_back(file: &Path, pattern: &str) {
+    if is_text(file) {
+        let mut printed_header = false;
+        let finder = memmem::Finder::new(pattern);
+        let file_handle = File::open(file).unwrap();
+        let reader = io::BufReader::new(file_handle);
 
-                        if switcher {
-                            let v: Vec<&str> = ln.as_str().split(pt).collect();
-                            let v_len = v.len();
-                            print!("{num:->6}: ", num=line_num);
-                            for i in 1..v_len + 1 {
-                                if i == v_len {
-                                    println!("{}", &v[i - 1]);
-                                } else {
-                                    print!("{}", &v[i - 1]);
-                                    print!("{}", pt.red().purple().magenta().bold());
-                                }
-                            }
+        for (line_num, line) in reader.lines().enumerate() {
+            if let Ok(ln) = line {
+                if finder.find(ln.as_bytes()).is_some() {
+                    if !printed_header {
+                        if let Some(path_str) = file.to_str() {
+                            println!("{}", path_str.green().bold());
                         }
-                    } else {
-                        ()
+                        printed_header = true;
                     }
+
+                    let parts: Vec<&str> = ln.split(pattern).collect();
+                    print!("{:>6}: ", line_num + 1);
+                    for (i, part) in parts.iter().enumerate() {
+                        if i > 0 {
+                            print!("{}", pattern.red().bold());
+                        }
+                        print!("{}", part);
+                    }
+                    println!();
                 }
-                Err(_) => (),
             }
         }
     }
@@ -112,157 +85,100 @@ fn call_back(de: &Path, pt: &String) {
 
 fn main() {
     let args: Vec<String> = args().collect();
-    if (args.len() == 2 && stdin_isatty()) || (args.len() != 2 && args.len() != 3 && args.len() != 5) {
-        println!("usage:   sss pattern-string root-directory");
-        println!("         sss -t file_ext pattern-string root-directory");
-        println!("         sss pattern-string root-directory -t file_ext");
-        println!("         command | sss pattern-string");
-        println!("version: 3.4.3");
-        println!(r#"eg:      sss "func main(" ./src"#);
-        println!(r#"eg:      sss -t go "func main(" ./src"#);
-        println!(r#"eg:      sss "func main(" ./src -t cpp"#);
-        println!(r#"eg:      somme_command | sss "pattern-string""#);
+    if invalid_arguments(&args) {
+        print_usage();
         return;
     }
-
-    if args.len() == 2 && !stdin_isatty() {
-        let buf = io::BufReader::new(std::io::stdin());
-        for line in io::BufRead::lines(buf) {
-            match line {
-                Ok(ln) => {
-                    if ln.contains(args[1].as_str()) {
-                        let v: Vec<&str> = ln.split(args[1].as_str()).collect();
-                        let v_len = v.len();
-                        for i in 1..v_len + 1 {
-                            if i == v_len {
-                                println!("{}", &v[i - 1]);
-                            } else {
-                                print!("{}", &v[i - 1]);
-                                print!("{}", args[1].red().purple().magenta().bold());
-                            }
-                        }
-                    } else {
-                        ()
-                    }
-                }
-                Err(_) => (),
-            }
-        }
-        return
+    if args.len() == 2 && !atty::is(Stream::Stdin) {
+        process_stdin(&args[1]);
+        return;
     }
 
     let mut queue: VecDeque<PathBuf> = VecDeque::new();
     if args.len() == 3 {
-        let pattern_str = &args[1];
-        let root_dir = &args[2];
+        let pattern = &args[1];
+        let root_dir = Path::new(&args[2]);
+        enqueue_files(root_dir, "", pattern, &mut queue);
 
-        let pt = Path::new(&root_dir);
-        let v = find_match(pt, &"".to_string(), pattern_str, &call_back);
-        for element in v {
-            queue.push_back(element);
+        process_queue(&mut queue, pattern, "");
+    } else if let (Some(ext), pos) = extract_extension(&args) {
+        let pattern;
+        let root_dir;
+        if pos == 1 {
+            pattern = &args[3];
+            root_dir = Path::new(&args[4]);
+        } else {
+            pattern = &args[1];
+            root_dir = Path::new(&args[2]);
         }
-        while queue.len() != 0 {
-            match queue.pop_front() {
-                Some(path_buf) => {
-                    for element in
-                        find_match(path_buf.as_path(), &"".to_string(), pattern_str, &call_back)
-                    {
-                        queue.push_back(element);
+        enqueue_files(root_dir, &ext, pattern, &mut queue);
+
+        process_queue(&mut queue, pattern, &ext);
+    }
+}
+
+fn invalid_arguments(args: &[String]) -> bool {
+    ((args.len() == 2) && atty::is(Stream::Stdin)) || (args.len() != 2 && args.len() != 3 && args.len() != 5)
+}
+
+fn print_usage() {
+    println!("usage:   sss pattern-string root-directory");
+    println!("         sss -t file_ext pattern-string root-directory");
+    println!("         sss pattern-string root-directory -t file_ext");
+    println!("         command | sss pattern-string");
+    println!("version: 3.4.3");
+    println!(r#"eg:      sss "func main(" ./src"#);
+    println!(r#"eg:      sss -t go "func main(" ./src"#);
+    println!(r#"eg:      sss "func main(" ./src -t cpp"#);
+    println!(r#"eg:      some_command | sss "pattern-string""#);
+}
+
+fn process_stdin(pattern: &str) {
+    let reader = io::BufReader::new(io::stdin());
+    for line in reader.lines() {
+        if let Ok(ln) = line {
+            let parts: Vec<&str> = ln.split(pattern).collect();
+            if parts.len() > 1 {
+                for (i, part) in parts.iter().enumerate() {
+                    if i > 0 {
+                        print!("{}", pattern.red().bold());
                     }
+                    print!("{}", part);
                 }
-                None => (),
-            }
-        }
-    } else {
-        if args.contains(&"-t".to_string()) {
-            if let Some(index) = args.iter().position(|&ref r| *r == "-t".to_string()) {
-                if index == 1 {
-                    let pattern_str = &args[3];
-                    let root_dir = &args[4];
-                    let pt = Path::new(&root_dir);
-                    let v = find_match(pt, &args[2], pattern_str, &call_back);
-                    for element in v {
-                        queue.push_back(element);
-                    }
-                    while queue.len() != 0 {
-                        match queue.pop_front() {
-                            Some(path_buf) => {
-                                for element in find_match(
-                                    path_buf.as_path(),
-                                    &args[2],
-                                    pattern_str,
-                                    &call_back,
-                                ) {
-                                    queue.push_back(element);
-                                }
-                            }
-                            None => (),
-                        }
-                    }
-                } else if index == 3 {
-                    let pattern_str = &args[1];
-                    let root_dir = &args[2];
-                    let pt = Path::new(&root_dir);
-                    let v = find_match(pt, &args[4], pattern_str, &call_back);
-                    for element in v {
-                        queue.push_back(element);
-                    }
-                    while queue.len() != 0 {
-                        match queue.pop_front() {
-                            Some(path_buf) => {
-                                for element in find_match(
-                                    path_buf.as_path(),
-                                    &args[4],
-                                    pattern_str,
-                                    &call_back,
-                                ) {
-                                    queue.push_back(element);
-                                }
-                            }
-                            None => (),
-                        }
-                    }
-                } else {
-                }
+                println!();
             }
         }
     }
 }
 
-fn find_match(
-    root_dir: &Path,
-    file_ext: &String,
-    pattern_str: &String,
-    cb: &dyn Fn(&Path, &String),
-) -> Vec<PathBuf> {
-    let mut vec: Vec<PathBuf> = vec![];
-
-    match fs::read_dir(root_dir) {
-        Ok(iterator_obj) => {
-            for entry in iterator_obj {
-                match entry {
-                    Ok(ref dir_entry) => {
-                        if !dir_entry.path().as_path().is_dir() {
-                            if *file_ext == "".to_string() {
-                                cb(dir_entry.path().as_path(), pattern_str);
-                            } else {
-                                if let Some(ext_name) = dir_entry.path().as_path().extension() {
-                                    if OsString::from(file_ext) == ext_name {
-                                        cb(dir_entry.path().as_path(), pattern_str);
-                                    } else {
-                                    }
-                                } else {
-                                }
-                            }
-                        } else {
-                            vec.push(dir_entry.path());
-                        }
-                    }
-                    Err(_) => (),
-                }
+fn enqueue_files(root_dir: &Path, file_ext: &str, pattern: &str, queue: &mut VecDeque<PathBuf>) {
+    if let Ok(entries) = fs::read_dir(root_dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                queue.push_back(path);
+            } else if file_ext.is_empty() || path.extension().and_then(|ext| ext.to_str()) == Some(file_ext) {
+                call_back(&path, pattern);
             }
         }
-        Err(_) => (),
     }
-    vec
+}
+
+fn process_queue(queue: &mut VecDeque<PathBuf>, pattern: &str, file_ext: &str) {
+    while let Some(path) = queue.pop_front() {
+        enqueue_files(&path, file_ext, pattern, queue);
+    }
+}
+
+fn extract_extension(args: &[String]) -> (Option<String>, i32) {
+    if args.contains(&"-t".to_string()) {
+        if let Some(pos) = args.iter().position(|r| r == "-t") {
+            if pos == 1 {
+                return (Some(args[2].clone()), 1);
+            } else if pos == 3 {
+                return (Some(args[4].clone()), 3);
+            }
+        }
+    }
+    (None, -1)
 }
