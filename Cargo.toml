@@ -118,6 +118,11 @@ mimalloc = { version = "0.1.43", features = ["secure"] }
 colored = "2.1.0"
 atty = "0.2.14"
 memchr = { version = "2.7.4", default-features = false }
+walkdir = "2.5.0"
+rayon = "1.10.0"
+memmap2 = "0.9.4"
+# Clap requires the "derive" feature for the attribute macros
+clap = { version = "4.5.4", features = ["derive"] }
 
 [profile.release]
 opt-level = 3
